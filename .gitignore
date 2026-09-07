@@ -1,0 +1,43 @@
+# Data (PhysioNet DUA — never commit)
+data/raw/
+data/processed/
+*.csv
+!tests/fixtures/**/*.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# ML artifacts
+artifacts/
+models/*.joblib
+models/*.pkl
+runs/
+wandb/
+mlruns/
+*.pt
+*.ckpt
+
+# Notebooks / IDE
+.ipynb_checkpoints/
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Coverage / test
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
