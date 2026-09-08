@@ -70,9 +70,21 @@ def feature_matrix(
             "study_interval",
             "lh_surge",
             "phase_label",
+            "pdg_rise",
+            "pdg_baseline",
+            # Derived from phase-labeled cycle starts — exclude for wearable-only claims.
+            "day_in_cycle_sin",
+            "day_in_cycle_cos",
         }:
             continue
-        if not include_hormones_as_features and col in {"lh", "estrogen", "pdg", "e3g"}:
+        if not include_hormones_as_features and col in {
+            "lh",
+            "estrogen",
+            "pdg",
+            "e3g",
+            "pdg_rise",
+            "pdg_baseline",
+        }:
             continue
         if pd.api.types.is_numeric_dtype(out[col]):
             feature_cols.append(col)

@@ -28,6 +28,12 @@ mlruns/
 *.pt
 *.ckpt
 
+# Web
+web/node_modules/
+web/.next/
+web/.vercel/
+web/out/
+
 # Notebooks / IDE
 .ipynb_checkpoints/
 .DS_Store
