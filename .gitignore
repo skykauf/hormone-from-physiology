@@ -1,6 +1,7 @@
 # Data (PhysioNet DUA — never commit)
 data/raw/
 data/processed/
+data/partial/
 *.csv
 !tests/fixtures/**/*.csv
 

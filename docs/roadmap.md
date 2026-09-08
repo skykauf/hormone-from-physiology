@@ -14,8 +14,8 @@
 - [x] Stronger features (z-scores, temp-vs-nadir) + class-balanced LOSO + phase smoothing
 - [x] Biphasic luteal task + PR-AUC for LH surge
 - [x] Ablation harness (temp / RHR / RHR+temp / multimodal)
+- [x] Download optional Fitbit tables into `data/raw/` for true multimodal lift
 - [ ] Ovulation / fertile-window timing metrics (day error, sensitivity/specificity)
-- [ ] Download optional Fitbit tables into `data/raw/` for true multimodal lift
 
 ## v0.3
 

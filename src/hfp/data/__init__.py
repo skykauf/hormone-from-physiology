@@ -300,9 +300,14 @@ def load_wrist_temperature(data_dir: Path | None = None) -> pd.DataFrame | None:
         "temperature",
         "nightly_temperature",
         "relative_temperature",
+        "temperature_diff_from_baseline",
         "value",
     ]
     out = _day_agg(df, preferred)
+    if "temperature_diff_from_baseline" in out.columns:
+        out = out.rename(
+            columns={"temperature_diff_from_baseline": "wrist_temp_relative"}
+        )
     if "nightly_temperature" in out.columns:
         out = out.rename(columns={"nightly_temperature": "wrist_temperature"})
     elif "temperature" in out.columns:
