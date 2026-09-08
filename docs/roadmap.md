@@ -10,10 +10,12 @@
 
 ## v0.2
 
-- [ ] Ingest optional mcPHASES Fitbit tables (sleep, HRV, RR, SpO₂, stress)
+- [x] Ingest optional mcPHASES Fitbit tables (sleep, HRV, RR, stress, wrist temp) when present
+- [x] Stronger features (z-scores, temp-vs-nadir) + class-balanced LOSO + phase smoothing
+- [x] Biphasic luteal task + PR-AUC for LH surge
+- [x] Ablation harness (temp / RHR / RHR+temp / multimodal)
 - [ ] Ovulation / fertile-window timing metrics (day error, sensitivity/specificity)
-- [ ] Ablation scripts (temp-only vs RHR-only vs multimodal)
-- [ ] Reproduce figures similar to the official mcPHASES sample analysis
+- [ ] Download optional Fitbit tables into `data/raw/` for true multimodal lift
 
 ## v0.3
 

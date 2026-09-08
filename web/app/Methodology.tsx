@@ -1,6 +1,7 @@
 "use client";
 
 import type { UiBundle } from "@/lib/types";
+import { pct } from "@/lib/types";
 
 export function Methodology({ data }: { data: UiBundle }) {
   const { dataset, phase_model: phase } = data;
@@ -38,7 +39,12 @@ export function Methodology({ data }: { data: UiBundle }) {
             </li>
             <li>
               <strong>Wearables:</strong> Fitbit Sense resting heart rate and nightly skin
-              temperature (day aggregates).
+              temperature (always). Optional mid-size tables when present in{" "}
+              <code>data/raw/</code>: sleep, sleep score, HRV, respiratory rate, stress
+              score, wrist temperature. Currently loaded:{" "}
+              {(dataset.optional_tables_present?.length ?? 0) > 0
+                ? dataset.optional_tables_present!.join(", ")
+                : "none (RHR+temp only)"}.
             </li>
             <li>
               <strong>Hormone ground truth:</strong> Mira daily urine LH, E3G
@@ -69,16 +75,20 @@ export function Methodology({ data }: { data: UiBundle }) {
             PdG-rise days (vs early-cycle baseline) for secondary tasks.
           </li>
           <li>
-            <strong>Engineer wearable features</strong> only: raw RHR/temp, 3/7-day
-            rolling means, 1-day deltas, deviation from personal expanding median, plus
-            weekend flag.
+            <strong>Engineer wearable features</strong> only: raw channels, 3/7-day
+            rolling means, deltas, personal expanding median deviation, expanding
+            z-scores, BBT-style temperature-vs-nadir, weekend flag. Optional sleep/HRV/RR
+            /stress when tables are present.
           </li>
           <li>
-            <strong>Train</strong> HistGradientBoosting classifiers with median imputation.
+            <strong>Train</strong> HistGradientBoosting with median imputation and{" "}
+            <em>balanced</em> sample weights; majority-smooth phase predictions within
+            subject (window=3) at inference only.
           </li>
           <li>
-            <strong>Evaluate</strong> leave-one-subject-out (LOSO): each held-out person is
-            never seen in training — the conservative scheme commercial claims often cite.
+            <strong>Evaluate</strong> leave-one-subject-out (LOSO). Report balanced
+            accuracy + macro-F1 for phase; biphasic luteal task; PR-AUC for LH surge.
+            Channel ablations: temp_only / rhr_only / rhr_temp / multimodal.
           </li>
         </ol>
       </section>
@@ -114,18 +124,18 @@ export function Methodology({ data }: { data: UiBundle }) {
           <div className="panel method-block">
             <h3>Phase classification</h3>
             <p>
-              4-class day-level prediction of Mira phase. Primary metrics: LOSO accuracy
-              and macro-F1 (currently {(phase.accuracy * 100).toFixed(1)}% /{" "}
-              {phase.macro_f1.toFixed(3)}). Confusion matrix and per-subject scores are on
-              the Results tab.
+              4-class day-level Mira phase. Primary metrics: LOSO balanced accuracy and
+              macro-F1 (currently{" "}
+              {pct(phase.balanced_accuracy ?? phase.accuracy)} / {phase.macro_f1.toFixed(3)}
+              ). Confusion matrix and per-subject scores are on Results.
             </p>
           </div>
           <div className="panel method-block">
-            <h3>LH-surge detection</h3>
+            <h3>Biphasic + LH surge</h3>
             <p>
-              Binary day-level surge label. Accuracy can look high under class imbalance;
-              macro-F1 is the more honest summary. This is a research heuristic, not a
-              clinical LH-strip protocol.
+              Biphasic: pre-luteal (Menstrual+Follicular) vs Luteal; Fertility excluded.
+              LH surge: prefer PR-AUC / macro-F1 — raw accuracy is misleading with ~5%
+              positives.
             </p>
           </div>
         </div>
@@ -151,7 +161,9 @@ export function Methodology({ data }: { data: UiBundle }) {
       <section className="section">
         <h2>Reproduce</h2>
         <div className="panel method-block">
-          <pre className="code-block">{`# after PhysioNet DUA download into data/raw/
+          <pre className="code-block">{`# core tables in data/raw/, then optional Fitbit extras:
+export PHYSIONET_USER=... PHYSIONET_PASSWORD=...
+python scripts/download_mcphases_extras.py
 pip install -e ".[dev]"
 python scripts/build_ui_bundle.py --data-dir data/raw --out artifacts/ui_bundle.json`}</pre>
           <p style={{ marginBottom: 0 }}>

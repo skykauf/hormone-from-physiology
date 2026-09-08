@@ -33,7 +33,9 @@ function heat(v: number, max: number): string {
 export function Dashboard({ data }: { data: UiBundle }) {
   const [tab, setTab] = useState<Tab>("results");
   const { phase_model: phase, dataset, lh_surge_model: lh } = data;
-  const cmMax = Math.max(...phase.confusion_matrix.flat());
+  const biphasic = data.biphasic_model;
+  const ablations = data.ablations;
+  const cmMax = Math.max(...(phase.confusion_matrix?.flat() ?? [0]));
   const physHr = Object.entries(data.physiology_by_phase.resting_hr ?? {}).map(
     ([phaseName, stats]) => ({
       phase: phaseName,
@@ -47,7 +49,20 @@ export function Dashboard({ data }: { data: UiBundle }) {
     median: stats?.median ?? 0,
   }));
 
-  const subjectSorted = [...phase.per_subject].sort((a, b) => b.accuracy - a.accuracy);
+  const subjectSorted = [...(phase.per_subject ?? [])].sort(
+    (a, b) => b.accuracy - a.accuracy,
+  );
+
+  const ablationRows = ablations
+    ? Object.entries(ablations.configs).map(([name, cfg]) => ({
+        name,
+        n_features: cfg.n_features,
+        bal_acc: cfg.phase?.balanced_accuracy,
+        macro_f1: cfg.phase?.macro_f1,
+        biphasic: cfg.biphasic?.accuracy,
+        lh_pr_auc: cfg.lh_surge?.pr_auc,
+      }))
+    : [];
 
   return (
     <main>
@@ -55,9 +70,9 @@ export function Dashboard({ data }: { data: UiBundle }) {
         <div className="eyebrow">Open research baseline · mcPHASES</div>
         <h1>Hormone from Physiology</h1>
         <p className="lede">
-          Wearable resting heart rate + nightly temperature → menstrual phase and LH
-          surge labels, evaluated leave-one-subject-out. Aggregates only — no raw
-          PhysioNet rows ship with this UI.
+          Wearable physiology → menstrual phase / biphasic luteal state / LH surge,
+          evaluated leave-one-subject-out with class-balanced trees and temporal
+          smoothing. Aggregates only — no raw PhysioNet rows ship with this UI.
         </p>
         <nav className="tabs" aria-label="Primary">
           <button
@@ -89,14 +104,27 @@ export function Dashboard({ data }: { data: UiBundle }) {
         <>
       <section className="metrics">
         <div className="metric">
-          <div className="label">Phase LOSO accuracy</div>
-          <div className="value">{pct(phase.accuracy)}</div>
-          <div className="hint">macro-F1 {phase.macro_f1.toFixed(3)}</div>
+          <div className="label">Phase balanced acc.</div>
+          <div className="value">{pct(phase.balanced_accuracy ?? phase.accuracy)}</div>
+          <div className="hint">
+            acc {pct(phase.accuracy)} · macro-F1 {phase.macro_f1.toFixed(3)}
+          </div>
         </div>
         <div className="metric">
-          <div className="label">LH-surge LOSO accuracy</div>
-          <div className="value">{pct(lh.accuracy)}</div>
-          <div className="hint">macro-F1 {lh.macro_f1.toFixed(3)} (imbalanced)</div>
+          <div className="label">Biphasic luteal acc.</div>
+          <div className="value">{pct(biphasic?.accuracy)}</div>
+          <div className="hint">
+            bal {pct(biphasic?.balanced_accuracy)} · F1{" "}
+            {biphasic?.macro_f1 != null ? biphasic.macro_f1.toFixed(3) : "—"}
+          </div>
+        </div>
+        <div className="metric">
+          <div className="label">LH-surge PR-AUC</div>
+          <div className="value">{pct(lh.pr_auc)}</div>
+          <div className="hint">
+            macro-F1 {lh.macro_f1 != null ? lh.macro_f1.toFixed(3) : "—"} · pos rate{" "}
+            {pct(lh.positive_rate)}
+          </div>
         </div>
         <div className="metric">
           <div className="label">Subjects / cycles</div>
@@ -107,16 +135,52 @@ export function Dashboard({ data }: { data: UiBundle }) {
               / {dataset.n_complete_cycles}
             </span>
           </div>
-          <div className="hint">{dataset.n_days.toLocaleString()} labeled days</div>
-        </div>
-        <div className="metric">
-          <div className="label">Wearable channels</div>
-          <div className="value" style={{ fontSize: "1.25rem", marginTop: "0.55rem" }}>
-            RHR · temp
+          <div className="hint">
+            {dataset.features.length} features
+            {(dataset.optional_tables_present?.length ?? 0) > 0
+              ? ` · +${dataset.optional_tables_present!.length} Fitbit tables`
+              : " · RHR+temp (+ eng.)"}
           </div>
-          <div className="hint">{dataset.features.length} engineered features</div>
         </div>
       </section>
+
+      {ablationRows.length > 0 && (
+        <section className="section">
+          <h2>Channel ablations</h2>
+          <p>
+            Same LOSO protocol; only the wearable channel family changes. Multimodal
+            falls back to RHR+temp until optional Fitbit tables are downloaded.
+          </p>
+          <div className="panel" style={{ overflowX: "auto" }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Config</th>
+                  <th>Features</th>
+                  <th>Phase bal. acc</th>
+                  <th>Phase macro-F1</th>
+                  <th>Biphasic acc</th>
+                  <th>LH PR-AUC</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ablationRows.map((row) => (
+                  <tr key={row.name}>
+                    <td>
+                      <code>{row.name}</code>
+                    </td>
+                    <td>{row.n_features}</td>
+                    <td>{pct(row.bal_acc)}</td>
+                    <td>{row.macro_f1 != null ? row.macro_f1.toFixed(3) : "—"}</td>
+                    <td>{pct(row.biphasic)}</td>
+                    <td>{pct(row.lh_pr_auc)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       <section className="section grid-2">
         <div>
@@ -131,7 +195,7 @@ export function Dashboard({ data }: { data: UiBundle }) {
                 </div>
               ))}
             </div>
-            {phase.confusion_matrix.map((row, i) => (
+            {(phase.confusion_matrix ?? []).map((row, i) => (
               <div className="cm-row" key={phase.phase_names[i]}>
                 <div className="cm-label">{phase.phase_names[i]}</div>
                 {row.map((v, j) => (
@@ -266,10 +330,11 @@ export function Dashboard({ data }: { data: UiBundle }) {
       </section>
 
       <div className="note">
-        Honest read: with only RHR + temperature (no calendar day, no hormone features),
-        4-class phase LOSO accuracy is modest (~{pct(phase.accuracy)}). That gap is the
-        research problem — multimodal sensing and denser pairing are what commercial
-        systems claim to close. LH-surge accuracy looks high mainly from class imbalance.
+        Honest read: 4-class phase prediction from RHR+temperature alone remains hard.
+        Prefer <em>balanced accuracy</em> / macro-F1 over raw accuracy, and PR-AUC for
+        LH surge (positive rate is low). Biphasic luteal detection is the cleaner fit
+        for these two channels. Download Fitbit sleep/HRV/RR/stress tables into{" "}
+        <code>data/raw/</code> to unlock the multimodal ablation.
       </div>
 
       <footer className="footer">

@@ -17,9 +17,19 @@ Place CSVs in `data/raw/` (gitignored) or point `MCPHASES_DATA_DIR` at the extra
 | `resting_heart_rate.csv` | Fitbit resting HR |
 | `computed_temperature.csv` | Nightly skin temperature |
 
-## Useful additional tables
+## Optional multimodal tables
 
-Heart rate, HRV, sleep stages, respiratory rate, SpO₂, stress score, and Dexcom glucose — see the PhysioNet file list and the official example repo: https://github.com/chai-toronto/mcphases
+Download with `python scripts/download_mcphases_extras.py` (PhysioNet credentials required):
+
+| File | Role |
+|---|---|
+| `sleep.csv` / `sleep_score.csv` | Sleep stages and quality scores |
+| `heart_rate_variability_details.csv` | Nightly HRV (e.g. RMSSD) |
+| `respiratory_rate_summary.csv` | Sleep breathing rate |
+| `stress_score.csv` | Fitbit stress score components |
+| `wrist_temperature.csv` | Wrist temperature deviations |
+
+Skip huge streams (`calories.csv`, raw `heart_rate.csv`) unless you need them.
 
 ## Join keys
 

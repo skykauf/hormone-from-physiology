@@ -4,28 +4,29 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from hfp.data import load_daily_panel
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from hfp.data import available_optional_tables, load_daily_panel
 from hfp.data.cycles import assign_menstrual_cycles, complete_cycles
-from hfp.data.features import feature_matrix
-from hfp.eval import per_subject_accuracy, phase_metrics
 from hfp.labels import PHASE_ORDER, label_lh_surge, label_pdg_rise
-from hfp.models import train_lh_surge_detector, train_phase_classifier
+from run_ablations import run_ablations
 
 
-def _anon_map(ids: pd.Series) -> dict[str, str]:
-    unique = sorted(ids.dropna().astype(str).unique())
+def _anon_map(ids: list | pd.Series) -> dict[str, str]:
+    unique = sorted({str(x) for x in ids if pd.notna(x)})
     return {uid: f"P{i:02d}" for i, uid in enumerate(unique, start=1)}
 
 
 def _phase_physiology(panel: pd.DataFrame) -> dict:
     out: dict[str, dict[str, dict[str, float]]] = {}
-    for signal in ("resting_hr", "nightly_temperature"):
+    for signal in ("resting_hr", "nightly_temperature", "hrv_rmssd", "stress_score"):
         if signal not in panel.columns:
             continue
         out[signal] = {}
@@ -44,14 +45,12 @@ def _phase_physiology(panel: pd.DataFrame) -> dict:
 
 
 def _hormone_curves(panel: pd.DataFrame, grid: np.ndarray | None = None) -> dict:
-    """Population mean hormone trajectories on a normalized cycle % grid."""
     grid = grid if grid is not None else np.linspace(0, 100, 50)
     df = panel.dropna(subset=["cycle_pct", "cycle_id"]).copy()
     curves: dict[str, list[dict[str, float]]] = {}
     for col, key in (("lh", "lh"), ("estrogen", "e3g"), ("pdg", "pdg")):
         points = []
         for x in grid:
-            # nearest-bin mean within ±1%
             mask = (df["cycle_pct"] - x).abs() <= 1.5
             vals = df.loc[mask, col].dropna()
             if len(vals) == 0:
@@ -75,22 +74,27 @@ def build_bundle(data_dir: Path | None = None) -> dict:
     panel = label_lh_surge(panel)
     panel = label_pdg_rise(panel)
 
-    X, feature_cols = feature_matrix(panel)
-    panel = panel.loc[X.index].copy()
-    for c in feature_cols:
-        panel[c] = X[c]
+    ablations = run_ablations(data_dir)
+    primary_key = "multimodal" if "multimodal" in ablations["configs"] else "rhr_temp"
+    primary = ablations["configs"][primary_key]
+    feature_cols = primary["features"]
 
-    anon = _anon_map(panel["id"])
-    phase_result = train_phase_classifier(panel, feature_cols)
-    lh_result = train_lh_surge_detector(panel, feature_cols)
+    anon = _anon_map(
+        [row["id"] for row in (primary["phase"].get("per_subject") or [])]
+    )
+    per_subject = [
+        {**row, "id": anon.get(str(row["id"]), str(row["id"]))}
+        for row in (primary["phase"].get("per_subject") or [])
+    ]
 
-    phase_m = phase_metrics(phase_result.y_true, phase_result.y_pred)
-    subject_df = per_subject_accuracy(phase_result.y_true, phase_result.y_pred, phase_result.groups)
-    subject_df["id"] = subject_df["id"].astype(str).map(anon)
+    # Keep ablation JSON lean for the public UI.
+    lean_ablations = json.loads(json.dumps(ablations))
+    for cfg in lean_ablations.get("configs", {}).values():
+        if isinstance(cfg.get("phase"), dict):
+            cfg["phase"].pop("per_subject", None)
 
     n_subjects = panel["id"].nunique()
     n_cycles = panel.dropna(subset=["cycle_id"]).groupby(["id", "cycle_id"]).ngroups
-    n_days = len(panel)
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -100,24 +104,40 @@ def build_bundle(data_dir: Path | None = None) -> dict:
             "citation_doi": "10.13026/zx6a-2c81",
             "n_subjects": int(n_subjects),
             "n_complete_cycles": int(n_cycles),
-            "n_days": int(n_days),
+            "n_days": int(len(panel)),
             "features": feature_cols,
+            "channel_set": primary_key,
+            "optional_tables_present": available_optional_tables(data_dir),
             "note": "Aggregates only — raw PhysioNet rows are not included.",
         },
         "phase_model": {
-            "evaluation": "leave-one-subject-out",
-            "accuracy": phase_m["accuracy"],
-            "macro_f1": phase_m["macro_f1"],
-            "phase_names": phase_m["phase_names"],
-            "confusion_matrix": phase_m["confusion_matrix"],
-            "per_subject": subject_df.to_dict(orient="records"),
+            "evaluation": "leave-one-subject-out + majority smooth (w=3)",
+            "accuracy": primary["phase"]["accuracy"],
+            "balanced_accuracy": primary["phase"].get("balanced_accuracy"),
+            "macro_f1": primary["phase"]["macro_f1"],
+            "per_class_recall": primary["phase"].get("per_class_recall"),
+            "phase_names": primary["phase"].get("phase_names") or list(PHASE_ORDER),
+            "confusion_matrix": primary["phase"].get("confusion_matrix"),
+            "per_subject": per_subject,
+        },
+        "biphasic_model": {
+            "evaluation": "leave-one-subject-out + majority smooth (w=3)",
+            "definition": "pre-luteal (Menstrual+Follicular) vs Luteal; Fertility excluded",
+            "accuracy": primary["biphasic"].get("accuracy"),
+            "balanced_accuracy": primary["biphasic"].get("balanced_accuracy"),
+            "macro_f1": primary["biphasic"].get("macro_f1"),
+            "pr_auc": primary["biphasic"].get("pr_auc"),
         },
         "lh_surge_model": {
             "evaluation": "leave-one-subject-out",
-            "accuracy": float(lh_result.metrics["accuracy"]),
-            "macro_f1": float(lh_result.metrics["macro_f1"]),
-            "train_auroc_final_model": lh_result.metrics.get("train_auroc_final_model"),
+            "accuracy": primary.get("lh_surge", {}).get("accuracy"),
+            "balanced_accuracy": primary.get("lh_surge", {}).get("balanced_accuracy"),
+            "macro_f1": primary.get("lh_surge", {}).get("macro_f1"),
+            "pr_auc": primary.get("lh_surge", {}).get("pr_auc"),
+            "positive_rate": primary.get("lh_surge", {}).get("positive_rate"),
+            "sensitivity_at_fpr": primary.get("lh_surge", {}).get("sensitivity_at_fpr"),
         },
+        "ablations": lean_ablations,
         "physiology_by_phase": _phase_physiology(panel),
         "hormone_curves": _hormone_curves(panel),
         "phase_counts": {
@@ -136,8 +156,11 @@ def main(argv: list[str] | None = None) -> None:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(bundle, indent=2))
     print(f"Wrote {args.out}")
+    bal = bundle["phase_model"].get("balanced_accuracy") or 0.0
     print(
-        f"Phase LOSO accuracy: {bundle['phase_model']['accuracy']:.3f} "
+        f"Phase LOSO bal_acc: {bal:.3f} "
+        f"macro_f1: {bundle['phase_model']['macro_f1']:.3f} | "
+        f"biphasic acc: {bundle['biphasic_model']['accuracy']:.3f} "
         f"({bundle['dataset']['n_subjects']} subjects, "
         f"{bundle['dataset']['n_complete_cycles']} cycles)"
     )

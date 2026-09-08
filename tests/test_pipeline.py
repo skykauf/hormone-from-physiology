@@ -65,18 +65,25 @@ def test_cycle_assignment_and_labels():
     assert set(encode_phase(df["phase"]).dropna().unique()).issubset({0, 1, 2, 3})
 
 
-def test_phase_classifier_loso_runs():
+def test_biphasic_and_ablation_channel_sets():
+    from hfp.labels import encode_biphasic
+    from hfp.models import train_biphasic_classifier
+
     df = pd.concat(
         [_fake_person("p1"), _fake_person("p2"), _fake_person("p3")],
         ignore_index=True,
     )
     df = assign_menstrual_cycles(df)
-    X, cols = feature_matrix(df)
-    # attach features onto panel
+    assert encode_biphasic(df["phase"]).dropna().isin([0, 1]).all()
+    X, cols = feature_matrix(df, channel_set="rhr_temp")
     panel = df.copy()
     for c in cols:
         panel[c] = X[c]
-    result = train_phase_classifier(panel, cols)
+    result = train_biphasic_classifier(panel, cols, fit_final=False, max_iter=50)
     assert "accuracy" in result.metrics
-    assert result.model is not None
-    assert len(result.y_true) == len(result.y_pred)
+    assert result.metrics["accuracy"] > 0.5
+
+    for cs in ("temp_only", "rhr_only", "rhr_temp", "multimodal"):
+        _, c = feature_matrix(df, channel_set=cs)
+        assert len(c) > 0
+
