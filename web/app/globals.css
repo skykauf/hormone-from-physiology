@@ -43,6 +43,102 @@ main {
   border-bottom: 1px solid var(--line);
 }
 
+.tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.tab {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--ink);
+  border-color: rgba(232, 242, 238, 0.28);
+}
+
+.tab.active {
+  color: var(--bg0);
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.methodology .section h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  font-size: 1.05rem;
+  margin: 0 0 0.45rem;
+}
+
+.method-block ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.method-block li + li {
+  margin-top: 0.45rem;
+}
+
+.method-block strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.method-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.method-steps li + li {
+  margin-top: 0.65rem;
+}
+
+.method-steps strong {
+  color: var(--ink);
+}
+
+code,
+.feat {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82em;
+  color: var(--accent);
+}
+
+.feat {
+  display: inline-block;
+  margin: 0.15rem 0.35rem 0.15rem 0;
+  padding: 0.12rem 0.4rem;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: rgba(111, 211, 163, 0.08);
+}
+
+.code-block {
+  margin: 0 0 0.85rem;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
 .eyebrow {
   color: var(--accent);
   letter-spacing: 0.12em;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -13,6 +14,7 @@ import {
 } from "recharts";
 import type { UiBundle, PhaseName } from "@/lib/types";
 import { pct } from "@/lib/types";
+import { Methodology } from "./Methodology";
 
 const PHASE_COLORS: Record<PhaseName, string> = {
   Menstrual: "#e89a7a",
@@ -21,12 +23,15 @@ const PHASE_COLORS: Record<PhaseName, string> = {
   Luteal: "#7eb6d9",
 };
 
+type Tab = "results" | "methodology";
+
 function heat(v: number, max: number): string {
   const t = max <= 0 ? 0 : Math.min(1, v / max);
   return `rgba(111, 211, 163, ${0.08 + t * 0.75})`;
 }
 
 export function Dashboard({ data }: { data: UiBundle }) {
+  const [tab, setTab] = useState<Tab>("results");
   const { phase_model: phase, dataset, lh_surge_model: lh } = data;
   const cmMax = Math.max(...phase.confusion_matrix.flat());
   const physHr = Object.entries(data.physiology_by_phase.resting_hr ?? {}).map(
@@ -54,8 +59,34 @@ export function Dashboard({ data }: { data: UiBundle }) {
           surge labels, evaluated leave-one-subject-out. Aggregates only — no raw
           PhysioNet rows ship with this UI.
         </p>
+        <nav className="tabs" aria-label="Primary">
+          <button
+            type="button"
+            className={tab === "results" ? "tab active" : "tab"}
+            onClick={() => setTab("results")}
+          >
+            Results
+          </button>
+          <button
+            type="button"
+            className={tab === "methodology" ? "tab active" : "tab"}
+            onClick={() => setTab("methodology")}
+          >
+            Methodology
+          </button>
+        </nav>
       </header>
 
+      {tab === "methodology" ? (
+        <>
+          <Methodology data={data} />
+          <footer className="footer">
+            Generated {new Date(data.generated_at).toUTCString()}. Dataset: {dataset.name}{" "}
+            v{dataset.version}. Research software only — not a medical device.
+          </footer>
+        </>
+      ) : (
+        <>
       <section className="metrics">
         <div className="metric">
           <div className="label">Phase LOSO accuracy</div>
@@ -257,6 +288,8 @@ export function Dashboard({ data }: { data: UiBundle }) {
         </a>
         . Research software only — not a medical device.
       </footer>
+        </>
+      )}
     </main>
   );
 }
