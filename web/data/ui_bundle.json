@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-08T05:02:49.950776+00:00",
+  "generated_at": "2026-09-08T05:19:54.052413+00:00",
   "dataset": {
     "name": "mcPHASES",
     "version": "1.0.0",
@@ -13,6 +13,32 @@
       "nightly_temperature",
       "baseline_relative_nightly_standard_deviation",
       "baseline_relative_sample_standard_deviation",
+      "minutes_asleep",
+      "minutes_awake",
+      "time_in_bed",
+      "sleep_efficiency",
+      "minutes_to_fall_asleep",
+      "minutes_after_wakeup",
+      "sleep_duration_min",
+      "sleep_overall_score",
+      "sleep_composition_score",
+      "sleep_revitalization_score",
+      "sleep_duration_score",
+      "sleep_deep_min_score",
+      "sleep_score_rhr",
+      "sleep_restlessness",
+      "hrv_rmssd",
+      "hrv_coverage",
+      "hrv_hf",
+      "hrv_lf",
+      "rr_full_sleep",
+      "rr_deep",
+      "rr_light",
+      "rr_rem",
+      "stress_score",
+      "stress_sleep_points",
+      "stress_responsiveness_points",
+      "stress_exertion_points",
       "resting_hr_roll3",
       "resting_hr_roll7",
       "resting_hr_delta1",
@@ -23,23 +49,54 @@
       "nightly_temperature_delta1",
       "nightly_temperature_vs_baseline",
       "nightly_temperature_z",
+      "hrv_rmssd_roll3",
+      "hrv_rmssd_roll7",
+      "hrv_rmssd_delta1",
+      "hrv_rmssd_vs_baseline",
+      "hrv_rmssd_z",
+      "rr_full_sleep_roll3",
+      "rr_full_sleep_roll7",
+      "rr_full_sleep_delta1",
+      "rr_full_sleep_vs_baseline",
+      "rr_full_sleep_z",
+      "stress_score_roll3",
+      "stress_score_roll7",
+      "stress_score_delta1",
+      "stress_score_vs_baseline",
+      "stress_score_z",
+      "sleep_duration_min_roll3",
+      "sleep_duration_min_roll7",
+      "sleep_duration_min_delta1",
+      "sleep_duration_min_vs_baseline",
+      "sleep_duration_min_z",
+      "sleep_overall_score_roll3",
+      "sleep_overall_score_roll7",
+      "sleep_overall_score_delta1",
+      "sleep_overall_score_vs_baseline",
+      "sleep_overall_score_z",
       "temp_vs_nadir",
       "temp_rise_from_nadir"
     ],
     "channel_set": "multimodal",
-    "optional_tables_present": [],
+    "optional_tables_present": [
+      "sleep.csv",
+      "sleep_score.csv",
+      "heart_rate_variability_details.csv",
+      "respiratory_rate_summary.csv",
+      "stress_score.csv"
+    ],
     "note": "Aggregates only \u2014 raw PhysioNet rows are not included."
   },
   "phase_model": {
     "evaluation": "leave-one-subject-out + majority smooth (w=3)",
-    "accuracy": 0.4091738931994523,
-    "balanced_accuracy": 0.3973327887564255,
-    "macro_f1": 0.39495362306080906,
+    "accuracy": 0.4347329986307622,
+    "balanced_accuracy": 0.4203989456484246,
+    "macro_f1": 0.41675986846165597,
     "per_class_recall": {
-      "Menstrual": 0.40350877192982454,
-      "Follicular": 0.3881019830028329,
-      "Fertility": 0.26666666666666666,
-      "Luteal": 0.5310537334263782
+      "Menstrual": 0.4269005847953216,
+      "Follicular": 0.42965061378659114,
+      "Fertility": 0.24444444444444444,
+      "Luteal": 0.5806001395673412
     },
     "phase_names": [
       "Menstrual",
@@ -49,28 +106,28 @@
     ],
     "confusion_matrix": [
       [
-        345,
-        195,
+        365,
+        185,
         119,
-        196
+        186
       ],
       [
-        248,
-        411,
-        221,
-        179
+        200,
+        455,
+        247,
+        157
       ],
       [
-        168,
-        336,
-        276,
-        255
+        155,
+        326,
+        253,
+        301
       ],
       [
-        183,
-        241,
-        248,
-        761
+        174,
+        209,
+        218,
+        832
       ]
     ],
     "per_subject": [
@@ -80,179 +137,189 @@
         "accuracy": 0.22988505747126436
       },
       {
-        "id": "P01",
-        "n_days": 56,
-        "accuracy": 0.26785714285714285
-      },
-      {
-        "id": "P31",
-        "n_days": 77,
-        "accuracy": 0.2727272727272727
-      },
-      {
-        "id": "P32",
-        "n_days": 83,
-        "accuracy": 0.27710843373493976
-      },
-      {
         "id": "P21",
         "n_days": 71,
-        "accuracy": 0.29577464788732394
-      },
-      {
-        "id": "P35",
-        "n_days": 193,
-        "accuracy": 0.3005181347150259
-      },
-      {
-        "id": "P06",
-        "n_days": 190,
-        "accuracy": 0.30526315789473685
-      },
-      {
-        "id": "P38",
-        "n_days": 169,
-        "accuracy": 0.3254437869822485
-      },
-      {
-        "id": "P08",
-        "n_days": 63,
-        "accuracy": 0.3333333333333333
-      },
-      {
-        "id": "P03",
-        "n_days": 71,
-        "accuracy": 0.3380281690140845
-      },
-      {
-        "id": "P29",
-        "n_days": 167,
-        "accuracy": 0.3413173652694611
-      },
-      {
-        "id": "P36",
-        "n_days": 117,
-        "accuracy": 0.3504273504273504
+        "accuracy": 0.2676056338028169
       },
       {
         "id": "P15",
         "n_days": 59,
-        "accuracy": 0.3898305084745763
-      },
-      {
-        "id": "P30",
-        "n_days": 190,
-        "accuracy": 0.39473684210526316
-      },
-      {
-        "id": "P26",
-        "n_days": 60,
-        "accuracy": 0.4
-      },
-      {
-        "id": "P05",
-        "n_days": 145,
-        "accuracy": 0.4
-      },
-      {
-        "id": "P19",
-        "n_days": 81,
-        "accuracy": 0.4074074074074074
-      },
-      {
-        "id": "P13",
-        "n_days": 152,
-        "accuracy": 0.40789473684210525
-      },
-      {
-        "id": "P27",
-        "n_days": 83,
-        "accuracy": 0.40963855421686746
-      },
-      {
-        "id": "P02",
-        "n_days": 158,
-        "accuracy": 0.4177215189873418
-      },
-      {
-        "id": "P42",
-        "n_days": 133,
-        "accuracy": 0.42105263157894735
-      },
-      {
-        "id": "P09",
-        "n_days": 135,
-        "accuracy": 0.4222222222222222
-      },
-      {
-        "id": "P18",
-        "n_days": 49,
-        "accuracy": 0.42857142857142855
-      },
-      {
-        "id": "P12",
-        "n_days": 165,
-        "accuracy": 0.4303030303030303
-      },
-      {
-        "id": "P16",
-        "n_days": 197,
-        "accuracy": 0.43147208121827413
-      },
-      {
-        "id": "P22",
-        "n_days": 141,
-        "accuracy": 0.4326241134751773
-      },
-      {
-        "id": "P04",
-        "n_days": 187,
-        "accuracy": 0.43315508021390375
-      },
-      {
-        "id": "P28",
-        "n_days": 77,
-        "accuracy": 0.44155844155844154
-      },
-      {
-        "id": "P37",
-        "n_days": 31,
-        "accuracy": 0.45161290322580644
+        "accuracy": 0.2711864406779661
       },
       {
         "id": "P17",
         "n_days": 77,
-        "accuracy": 0.4675324675324675
+        "accuracy": 0.2987012987012987
       },
       {
-        "id": "P33",
-        "n_days": 64,
-        "accuracy": 0.484375
+        "id": "P19",
+        "n_days": 81,
+        "accuracy": 0.30864197530864196
+      },
+      {
+        "id": "P01",
+        "n_days": 56,
+        "accuracy": 0.32142857142857145
+      },
+      {
+        "id": "P12",
+        "n_days": 165,
+        "accuracy": 0.3333333333333333
+      },
+      {
+        "id": "P31",
+        "n_days": 77,
+        "accuracy": 0.35064935064935066
+      },
+      {
+        "id": "P35",
+        "n_days": 193,
+        "accuracy": 0.35233160621761656
+      },
+      {
+        "id": "P06",
+        "n_days": 190,
+        "accuracy": 0.35789473684210527
+      },
+      {
+        "id": "P03",
+        "n_days": 71,
+        "accuracy": 0.36619718309859156
+      },
+      {
+        "id": "P41",
+        "n_days": 57,
+        "accuracy": 0.3684210526315789
       },
       {
         "id": "P24",
         "n_days": 61,
-        "accuracy": 0.4918032786885246
+        "accuracy": 0.3770491803278688
+      },
+      {
+        "id": "P38",
+        "n_days": 169,
+        "accuracy": 0.38461538461538464
+      },
+      {
+        "id": "P37",
+        "n_days": 31,
+        "accuracy": 0.3870967741935484
+      },
+      {
+        "id": "P18",
+        "n_days": 49,
+        "accuracy": 0.3877551020408163
+      },
+      {
+        "id": "P33",
+        "n_days": 64,
+        "accuracy": 0.390625
+      },
+      {
+        "id": "P08",
+        "n_days": 63,
+        "accuracy": 0.3968253968253968
       },
       {
         "id": "P20",
         "n_days": 65,
-        "accuracy": 0.49230769230769234
+        "accuracy": 0.4153846153846154
+      },
+      {
+        "id": "P30",
+        "n_days": 190,
+        "accuracy": 0.43157894736842106
+      },
+      {
+        "id": "P16",
+        "n_days": 197,
+        "accuracy": 0.4365482233502538
+      },
+      {
+        "id": "P05",
+        "n_days": 145,
+        "accuracy": 0.4413793103448276
+      },
+      {
+        "id": "P22",
+        "n_days": 141,
+        "accuracy": 0.46099290780141844
+      },
+      {
+        "id": "P32",
+        "n_days": 83,
+        "accuracy": 0.46987951807228917
+      },
+      {
+        "id": "P13",
+        "n_days": 152,
+        "accuracy": 0.47368421052631576
+      },
+      {
+        "id": "P02",
+        "n_days": 158,
+        "accuracy": 0.47468354430379744
+      },
+      {
+        "id": "P27",
+        "n_days": 83,
+        "accuracy": 0.4819277108433735
+      },
+      {
+        "id": "P29",
+        "n_days": 167,
+        "accuracy": 0.48502994011976047
+      },
+      {
+        "id": "P09",
+        "n_days": 135,
+        "accuracy": 0.4888888888888889
+      },
+      {
+        "id": "P28",
+        "n_days": 77,
+        "accuracy": 0.4935064935064935
+      },
+      {
+        "id": "P36",
+        "n_days": 117,
+        "accuracy": 0.5042735042735043
+      },
+      {
+        "id": "P04",
+        "n_days": 187,
+        "accuracy": 0.5080213903743316
       },
       {
         "id": "P10",
         "n_days": 65,
-        "accuracy": 0.49230769230769234
+        "accuracy": 0.5230769230769231
       },
       {
-        "id": "P23",
-        "n_days": 68,
-        "accuracy": 0.5
+        "id": "P14",
+        "n_days": 63,
+        "accuracy": 0.5238095238095238
+      },
+      {
+        "id": "P42",
+        "n_days": 133,
+        "accuracy": 0.5338345864661654
+      },
+      {
+        "id": "P11",
+        "n_days": 63,
+        "accuracy": 0.5396825396825397
       },
       {
         "id": "P07",
         "n_days": 90,
-        "accuracy": 0.5111111111111111
+        "accuracy": 0.5666666666666667
+      },
+      {
+        "id": "P26",
+        "n_days": 60,
+        "accuracy": 0.5666666666666667
       },
       {
         "id": "P34",
@@ -260,55 +327,51 @@
         "accuracy": 0.5730337078651685
       },
       {
-        "id": "P40",
-        "n_days": 85,
-        "accuracy": 0.5764705882352941
-      },
-      {
-        "id": "P11",
-        "n_days": 63,
-        "accuracy": 0.6190476190476191
+        "id": "P23",
+        "n_days": 68,
+        "accuracy": 0.6029411764705882
       },
       {
         "id": "P39",
         "n_days": 61,
-        "accuracy": 0.6557377049180327
+        "accuracy": 0.6229508196721312
       },
       {
-        "id": "P14",
-        "n_days": 63,
-        "accuracy": 0.6984126984126984
-      },
-      {
-        "id": "P41",
-        "n_days": 57,
-        "accuracy": 0.7017543859649122
+        "id": "P40",
+        "n_days": 85,
+        "accuracy": 0.6352941176470588
       }
     ]
   },
   "biphasic_model": {
     "evaluation": "leave-one-subject-out + majority smooth (w=3)",
     "definition": "pre-luteal (Menstrual+Follicular) vs Luteal; Fertility excluded",
-    "accuracy": 0.6832984762473857,
-    "balanced_accuracy": 0.6845991376575875,
-    "macro_f1": 0.6807507022401136,
-    "pr_auc": 0.6856233842646001
+    "accuracy": 0.7248282043621154,
+    "balanced_accuracy": 0.7223134927492798,
+    "macro_f1": 0.7207187667071375,
+    "pr_auc": 0.7210667307818948
   },
   "lh_surge_model": {
     "evaluation": "leave-one-subject-out",
-    "accuracy": 0.7958019621263974,
-    "balanced_accuracy": 0.5122875290749687,
-    "macro_f1": 0.48998128182022305,
-    "pr_auc": 0.06213529091625031,
+    "accuracy": 0.8578599133013918,
+    "balanced_accuracy": 0.5160851672928968,
+    "macro_f1": 0.5080225783488488,
+    "pr_auc": 0.06584379972438234,
     "positive_rate": 0.055441478439425054,
     "sensitivity_at_fpr": {
       "fpr_target": 0.1,
       "fpr": 0.1,
-      "sensitivity": 0.1440329218106996
+      "sensitivity": 0.13580246913580246
     }
   },
   "ablations": {
-    "optional_tables_present": [],
+    "optional_tables_present": [
+      "sleep.csv",
+      "sleep_score.csv",
+      "heart_rate_variability_details.csv",
+      "respiratory_rate_summary.csv",
+      "stress_score.csv"
+    ],
     "configs": {
       "temp_only": {
         "n_features": 10,
@@ -377,9 +440,10 @@
         "lh_surge": {}
       },
       "rhr_only": {
-        "n_features": 6,
+        "n_features": 7,
         "features": [
           "resting_hr",
+          "sleep_score_rhr",
           "resting_hr_roll3",
           "resting_hr_roll7",
           "resting_hr_delta1",
@@ -387,39 +451,39 @@
           "resting_hr_z"
         ],
         "phase": {
-          "accuracy": 0.3879507074395253,
-          "balanced_accuracy": 0.3733990346902107,
-          "macro_f1": 0.3677045691599903,
+          "accuracy": 0.3950251026928343,
+          "balanced_accuracy": 0.37857247020213125,
+          "macro_f1": 0.37356025565300083,
           "per_class_recall": {
-            "Menstrual": 0.4070175438596491,
-            "Follicular": 0.3323890462700661,
-            "Fertility": 0.2028985507246377,
-            "Luteal": 0.5512909979064898
+            "Menstrual": 0.38596491228070173,
+            "Follicular": 0.3654390934844193,
+            "Fertility": 0.19903381642512077,
+            "Luteal": 0.5638520586182834
           },
           "confusion_matrix": [
             [
-              348,
-              202,
-              82,
-              223
+              330,
+              221,
+              85,
+              219
             ],
             [
-              267,
-              352,
-              196,
-              244
-            ],
-            [
-              125,
-              318,
+              254,
+              387,
               210,
-              382
+              208
             ],
             [
-              185,
-              243,
-              215,
-              790
+              113,
+              346,
+              206,
+              370
+            ],
+            [
+              162,
+              277,
+              186,
+              808
             ]
           ],
           "phase_names": [
@@ -428,24 +492,25 @@
             "Fertility",
             "Luteal"
           ],
-          "per_subject_median_accuracy": 0.4079290558163797
+          "per_subject_median_accuracy": 0.3979695431472081
         },
         "biphasic": {
-          "accuracy": 0.651030773827308,
-          "balanced_accuracy": 0.6570874541794002,
-          "macro_f1": 0.6500741510935049,
-          "pr_auc": 0.6379692296991492
+          "accuracy": 0.6865850014938751,
+          "balanced_accuracy": 0.6902786315400316,
+          "macro_f1": 0.6848827214549629,
+          "pr_auc": 0.6853466289399497
         },
         "lh_surge": {}
       },
       "rhr_temp": {
-        "n_features": 17,
+        "n_features": 18,
         "features": [
           "is_weekend",
           "resting_hr",
           "nightly_temperature",
           "baseline_relative_nightly_standard_deviation",
           "baseline_relative_sample_standard_deviation",
+          "sleep_score_rhr",
           "resting_hr_roll3",
           "resting_hr_roll7",
           "resting_hr_delta1",
@@ -460,39 +525,39 @@
           "temp_rise_from_nadir"
         ],
         "phase": {
-          "accuracy": 0.4091738931994523,
-          "balanced_accuracy": 0.3973327887564255,
-          "macro_f1": 0.39495362306080906,
+          "accuracy": 0.40712003651300777,
+          "balanced_accuracy": 0.39589742135728384,
+          "macro_f1": 0.39256170794697,
           "per_class_recall": {
-            "Menstrual": 0.40350877192982454,
-            "Follicular": 0.3881019830028329,
-            "Fertility": 0.26666666666666666,
-            "Luteal": 0.5310537334263782
+            "Menstrual": 0.4152046783625731,
+            "Follicular": 0.3947119924457035,
+            "Fertility": 0.24541062801932367,
+            "Luteal": 0.5282623866015352
           },
           "confusion_matrix": [
             [
-              345,
-              195,
+              355,
+              184,
               119,
-              196
+              197
             ],
             [
-              248,
-              411,
-              221,
-              179
+              260,
+              418,
+              240,
+              141
             ],
             [
-              168,
-              336,
-              276,
-              255
+              178,
+              341,
+              254,
+              262
             ],
             [
-              183,
-              241,
-              248,
-              761
+              176,
+              277,
+              223,
+              757
             ]
           ],
           "phase_names": [
@@ -501,35 +566,61 @@
             "Fertility",
             "Luteal"
           ],
-          "per_subject_median_accuracy": 0.4216374269005848
+          "per_subject_median_accuracy": 0.41391614629794826
         },
         "biphasic": {
-          "accuracy": 0.6832984762473857,
-          "balanced_accuracy": 0.6845991376575875,
-          "macro_f1": 0.6807507022401136,
-          "pr_auc": 0.6856233842646001
+          "accuracy": 0.6964445772333433,
+          "balanced_accuracy": 0.694164313199614,
+          "macro_f1": 0.6923312439380999,
+          "pr_auc": 0.7092205404496068
         },
         "lh_surge": {
-          "accuracy": 0.7958019621263974,
-          "balanced_accuracy": 0.5122875290749687,
-          "macro_f1": 0.48998128182022305,
-          "pr_auc": 0.06213529091625031,
+          "accuracy": 0.8028747433264887,
+          "balanced_accuracy": 0.5218420110932188,
+          "macro_f1": 0.49649680207543334,
+          "pr_auc": 0.06519265008430655,
           "positive_rate": 0.055441478439425054,
           "sensitivity_at_fpr": {
             "fpr_target": 0.1,
             "fpr": 0.1,
-            "sensitivity": 0.1440329218106996
+            "sensitivity": 0.13580246913580246
           }
         }
       },
       "multimodal": {
-        "n_features": 17,
+        "n_features": 68,
         "features": [
           "is_weekend",
           "resting_hr",
           "nightly_temperature",
           "baseline_relative_nightly_standard_deviation",
           "baseline_relative_sample_standard_deviation",
+          "minutes_asleep",
+          "minutes_awake",
+          "time_in_bed",
+          "sleep_efficiency",
+          "minutes_to_fall_asleep",
+          "minutes_after_wakeup",
+          "sleep_duration_min",
+          "sleep_overall_score",
+          "sleep_composition_score",
+          "sleep_revitalization_score",
+          "sleep_duration_score",
+          "sleep_deep_min_score",
+          "sleep_score_rhr",
+          "sleep_restlessness",
+          "hrv_rmssd",
+          "hrv_coverage",
+          "hrv_hf",
+          "hrv_lf",
+          "rr_full_sleep",
+          "rr_deep",
+          "rr_light",
+          "rr_rem",
+          "stress_score",
+          "stress_sleep_points",
+          "stress_responsiveness_points",
+          "stress_exertion_points",
           "resting_hr_roll3",
           "resting_hr_roll7",
           "resting_hr_delta1",
@@ -540,43 +631,68 @@
           "nightly_temperature_delta1",
           "nightly_temperature_vs_baseline",
           "nightly_temperature_z",
+          "hrv_rmssd_roll3",
+          "hrv_rmssd_roll7",
+          "hrv_rmssd_delta1",
+          "hrv_rmssd_vs_baseline",
+          "hrv_rmssd_z",
+          "rr_full_sleep_roll3",
+          "rr_full_sleep_roll7",
+          "rr_full_sleep_delta1",
+          "rr_full_sleep_vs_baseline",
+          "rr_full_sleep_z",
+          "stress_score_roll3",
+          "stress_score_roll7",
+          "stress_score_delta1",
+          "stress_score_vs_baseline",
+          "stress_score_z",
+          "sleep_duration_min_roll3",
+          "sleep_duration_min_roll7",
+          "sleep_duration_min_delta1",
+          "sleep_duration_min_vs_baseline",
+          "sleep_duration_min_z",
+          "sleep_overall_score_roll3",
+          "sleep_overall_score_roll7",
+          "sleep_overall_score_delta1",
+          "sleep_overall_score_vs_baseline",
+          "sleep_overall_score_z",
           "temp_vs_nadir",
           "temp_rise_from_nadir"
         ],
         "phase": {
-          "accuracy": 0.4091738931994523,
-          "balanced_accuracy": 0.3973327887564255,
-          "macro_f1": 0.39495362306080906,
+          "accuracy": 0.4347329986307622,
+          "balanced_accuracy": 0.4203989456484246,
+          "macro_f1": 0.41675986846165597,
           "per_class_recall": {
-            "Menstrual": 0.40350877192982454,
-            "Follicular": 0.3881019830028329,
-            "Fertility": 0.26666666666666666,
-            "Luteal": 0.5310537334263782
+            "Menstrual": 0.4269005847953216,
+            "Follicular": 0.42965061378659114,
+            "Fertility": 0.24444444444444444,
+            "Luteal": 0.5806001395673412
           },
           "confusion_matrix": [
             [
-              345,
-              195,
+              365,
+              185,
               119,
-              196
+              186
             ],
             [
-              248,
-              411,
-              221,
-              179
+              200,
+              455,
+              247,
+              157
             ],
             [
-              168,
-              336,
-              276,
-              255
+              155,
+              326,
+              253,
+              301
             ],
             [
-              183,
-              241,
-              248,
-              761
+              174,
+              209,
+              218,
+              832
             ]
           ],
           "phase_names": [
@@ -585,24 +701,24 @@
             "Fertility",
             "Luteal"
           ],
-          "per_subject_median_accuracy": 0.4216374269005848
+          "per_subject_median_accuracy": 0.4389637668475407
         },
         "biphasic": {
-          "accuracy": 0.6832984762473857,
-          "balanced_accuracy": 0.6845991376575875,
-          "macro_f1": 0.6807507022401136,
-          "pr_auc": 0.6856233842646001
+          "accuracy": 0.7248282043621154,
+          "balanced_accuracy": 0.7223134927492798,
+          "macro_f1": 0.7207187667071375,
+          "pr_auc": 0.7210667307818948
         },
         "lh_surge": {
-          "accuracy": 0.7958019621263974,
-          "balanced_accuracy": 0.5122875290749687,
-          "macro_f1": 0.48998128182022305,
-          "pr_auc": 0.06213529091625031,
+          "accuracy": 0.8578599133013918,
+          "balanced_accuracy": 0.5160851672928968,
+          "macro_f1": 0.5080225783488488,
+          "pr_auc": 0.06584379972438234,
           "positive_rate": 0.055441478439425054,
           "sensitivity_at_fpr": {
             "fpr_target": 0.1,
             "fpr": 0.1,
-            "sensitivity": 0.1440329218106996
+            "sensitivity": 0.13580246913580246
           }
         }
       }
@@ -667,6 +783,66 @@
         "q25": 33.40289115884116,
         "q75": 34.67742524233013,
         "mean": 34.01606485028175
+      }
+    },
+    "hrv_rmssd": {
+      "Menstrual": {
+        "n": 716,
+        "median": 51.769999999999996,
+        "q25": 33.08825,
+        "q75": 74.644375,
+        "mean": 57.22871159217877
+      },
+      "Follicular": {
+        "n": 912,
+        "median": 49.2355,
+        "q25": 34.281875,
+        "q75": 71.062125,
+        "mean": 55.955708333333334
+      },
+      "Fertility": {
+        "n": 888,
+        "median": 46.331,
+        "q25": 30.034125000000003,
+        "q75": 69.82187499999999,
+        "mean": 52.984327139639646
+      },
+      "Luteal": {
+        "n": 1228,
+        "median": 43.5005,
+        "q25": 29.285125,
+        "q75": 64.57625,
+        "mean": 50.04562133550489
+      }
+    },
+    "stress_score": {
+      "Menstrual": {
+        "n": 650,
+        "median": 77.0,
+        "q25": 71.25,
+        "q75": 81.0,
+        "mean": 70.03538461538461
+      },
+      "Follicular": {
+        "n": 777,
+        "median": 78.0,
+        "q25": 72.0,
+        "q75": 83.0,
+        "mean": 69.68211068211068
+      },
+      "Fertility": {
+        "n": 806,
+        "median": 76.0,
+        "q25": 71.0,
+        "q75": 81.0,
+        "mean": 69.79652605459057
+      },
+      "Luteal": {
+        "n": 1097,
+        "median": 75.0,
+        "q25": 70.0,
+        "q75": 81.0,
+        "mean": 69.93892433910665
       }
     }
   },

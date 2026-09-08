@@ -143,37 +143,34 @@ def load_sleep(data_dir: Path | None = None) -> pd.DataFrame | None:
     if not path.exists():
         return None
     df = _resolve_day_col(pd.read_csv(path))
-    # Prefer main sleep if type column exists.
-    if "type" in df.columns:
+    # Prefer main sleep bouts when flagged.
+    if "mainsleep" in df.columns:
+        main = df[df["mainsleep"].astype(str).str.lower().isin(["true", "1", "yes"])]
+        if len(main):
+            df = main
+    elif "type" in df.columns:
         main = df[df["type"].astype(str).str.lower().isin(["stages", "main", "sleep"])]
         if len(main):
             df = main
+    # Normalize Fitbit-ish lowercase column names from mcPHASES.
+    rename_in = {
+        "minutesasleep": "minutes_asleep",
+        "minutesawake": "minutes_awake",
+        "timeinbed": "time_in_bed",
+        "minutestofallasleep": "minutes_to_fall_asleep",
+        "minutesafterwakeup": "minutes_after_wakeup",
+    }
+    df = df.rename(columns={k: v for k, v in rename_in.items() if k in df.columns})
     preferred = [
         "duration",
         "minutes_asleep",
-        "minutesAsleep",
         "minutes_awake",
-        "minutesAwake",
         "time_in_bed",
-        "timeInBed",
         "efficiency",
-        "deep",
-        "light",
-        "rem",
-        "wake",
-        "deep_minutes",
-        "rem_minutes",
-        "light_minutes",
-        "wake_minutes",
+        "minutes_to_fall_asleep",
+        "minutes_after_wakeup",
     ]
     out = _day_agg(df, preferred)
-    rename = {
-        "minutesAsleep": "minutes_asleep",
-        "minutesAwake": "minutes_awake",
-        "timeInBed": "time_in_bed",
-    }
-    out = out.rename(columns={k: v for k, v in rename.items() if k in out.columns})
-    # Duration often in ms in Fitbit exports.
     if "duration" in out.columns and out["duration"].median(skipna=True) > 10_000:
         out["sleep_duration_min"] = out["duration"] / 60000.0
         out = out.drop(columns=["duration"])
@@ -181,10 +178,8 @@ def load_sleep(data_dir: Path | None = None) -> pd.DataFrame | None:
         out = out.rename(columns={"duration": "sleep_duration_min"})
     if "minutes_asleep" in out.columns and "sleep_duration_min" not in out.columns:
         out["sleep_duration_min"] = out["minutes_asleep"]
-    if {"deep", "rem", "light", "sleep_duration_min"}.issubset(out.columns):
-        denom = out["sleep_duration_min"].replace(0, np.nan)
-        out["sleep_deep_frac"] = out["deep"] / denom
-        out["sleep_rem_frac"] = out["rem"] / denom
+    if "efficiency" in out.columns:
+        out = out.rename(columns={"efficiency": "sleep_efficiency"})
     return out
 
 
@@ -223,13 +218,24 @@ def load_hrv(data_dir: Path | None = None) -> pd.DataFrame | None:
     if not path.exists():
         return None
     df = _resolve_day_col(pd.read_csv(path))
-    preferred = ["rmssd", "coverage", "hf", "nremhr", "entropy"]
+    preferred = [
+        "rmssd",
+        "coverage",
+        "hf",
+        "high_frequency",
+        "low_frequency",
+        "nremhr",
+        "entropy",
+    ]
     out = _day_agg(df, preferred)
+    if "high_frequency" in out.columns and "hf" not in out.columns:
+        out = out.rename(columns={"high_frequency": "hf"})
     return out.rename(
         columns={
             "rmssd": "hrv_rmssd",
             "coverage": "hrv_coverage",
             "hf": "hrv_hf",
+            "low_frequency": "hrv_lf",
             "nremhr": "hrv_nremhr",
             "entropy": "hrv_entropy",
         }
